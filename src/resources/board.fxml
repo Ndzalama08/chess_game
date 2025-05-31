@@ -5,6 +5,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Rectangle?>
 
+
 <GridPane fx:id="chessBoard" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
     <!-- 8 rows -->
     <children>
