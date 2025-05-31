@@ -4,6 +4,7 @@ import chess.model.Move;
 import chess.model.Piece;
 
 public class Rook extends Piece {
+
     public Rook(boolean isWhite,String imagePath) {
         super(isWhite, imagePath);
     }

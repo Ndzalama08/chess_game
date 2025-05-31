@@ -1,5 +1,7 @@
 package chess.controller;
 
+import chess.model.Board;
+import chess.model.Piece;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -7,6 +9,7 @@ import javafx.scene.layout.StackPane;
 public class GameController {
     @FXML
     private GridPane chessBoard;
+    private final Board board = new Board();
 
     public void initialize() {
         for (int row = 0; row < 8; row++) {
@@ -18,10 +21,18 @@ public class GameController {
                 String color = (row + col) % 2 == 0 ? "#f0d9b5" : "#b58863"; // Light and dark squares
                 square.setStyle("-fx-background-color: " + color + ";");
 
-                // Optional: assign coordinates as IDs
+                // Checking if a piece exists at this position
+                Piece piece = board.getBoard()[row][col];
+                if (piece != null) {
+                    square.getChildren().add(piece.getPieceImage());
+                }
+
+                // assign coordinates as IDs
                 square.setId(row + "," + col);
 
                 chessBoard.add(square, col, row); // Add to GridPane
+
+
             }
         }
     }

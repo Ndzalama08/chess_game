@@ -6,7 +6,7 @@ import chess.model.Piece;
 public class Bishop extends Piece {
 
     public Bishop(boolean iswhite, String imagePath) {
-        super(iswhite, "asdsa");
+        super(iswhite, imagePath);
     }
 
     @Override
