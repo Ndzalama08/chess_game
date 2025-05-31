@@ -1,0 +1,50 @@
+/* style.css */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.login-form {
+    -fx-background-color: white;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 40 30;
+    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 4);
+}
+
+.title {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.label {
+    -fx-text-fill: #333;
+    -fx-font-size: 14px;
+}
+
+.text-field, .password-field {
+    -fx-pref-width: 280px;
+    -fx-background-radius: 6;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 6;
+    -fx-text-fill: blue;
+}
+
+.button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 10 40;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.1), 4, 0, 2, 2);
+}
+
+.hyperlink {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+}
+
+#login_pane{
+    -fx-background-color: white;
+}
