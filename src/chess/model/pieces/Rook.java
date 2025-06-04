@@ -11,6 +11,6 @@ public class Rook extends Piece {
 
     @Override
     public boolean isValidMove(Move move, Piece[][] board) {
-        return move.startX == move.endX || move.startY == move.endY;
+        return move.fromRow == move.toRow || move.fromCol == move.toCol;
     }
 }
