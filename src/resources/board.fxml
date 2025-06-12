@@ -1,90 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="chessBoard" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
-    <!-- 8 rows -->
-    <children>
-        <!-- We'll generate 8x8 manually for now -->
-        <!-- We can later generate this dynamically in code -->
-        <!-- Row 0 -->
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="chess.controller.GameController">
 
-        <!-- Repeat for rows 1 to 7... alternating colors -->
-        <!-- Row 1 -->
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <!-- Row 2 -->
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <!-- Row 3-->
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <!-- Row 4 -->
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="4" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <!-- Row 5 -->
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="5" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <!-- Row 6 -->
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="6" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <!-- Row 7 -->
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="0"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="1"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="2"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="3"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="4"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="5"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="6"><Rectangle width="60" height="60" fill="BLACK"/></StackPane>
-        <StackPane GridPane.rowIndex="7" GridPane.columnIndex="7"><Rectangle width="60" height="60" fill="WHITE"/></StackPane>
+    <top>
+        <HBox spacing="50" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label fx:id="whiteTimerLabel" text="White: 10:00" styleClass="timer"/>
+            <Label fx:id="blackTimerLabel" text="Black: 10:00" styleClass="timer"/>
+        </HBox>
+    </top>
 
+    <center>
+        <HBox spacing="10">
+            <!-- Board -->
+            <GridPane fx:id="chessBoard"/>
 
-    </children>
-</GridPane>
+            <!-- Inlined Move History -->
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <Label text="Move History" styleClass="title"/>
+                <ListView fx:id="historyList" prefWidth="150"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
