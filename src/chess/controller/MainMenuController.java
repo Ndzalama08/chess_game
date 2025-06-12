@@ -7,6 +7,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 public class MainMenuController {
     @FXML private Label welcomeLabel;
     @FXML private Button playPvPBtn;
@@ -27,11 +30,7 @@ public class MainMenuController {
         Main.showBoard();       // assumes BoardController handles PvP and flipping
     }
 
-    @FXML
-    private void onPlayAI() {
-        Main.showBoard();       // or a dedicated AI view if implemented
-        // You could configure GameManager for AI mode here
-    }
+
 
     @FXML
     private void onSettings() {
@@ -44,4 +43,8 @@ public class MainMenuController {
         Main.showLogin();
     }
 
+    @FXML
+    public void onPlayAI(ActionEvent e) throws IOException {
+        Main.startGame(false);
+    }
 }

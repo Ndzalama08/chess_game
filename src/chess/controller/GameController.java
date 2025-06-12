@@ -2,6 +2,7 @@
 package chess.controller;
 
 import chess.Main;
+import chess.logic.ChessAI;
 import chess.logic.GameManager;
 import chess.model.Board;
 import chess.model.Move;
@@ -23,29 +24,45 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.util.List;
+
 public class GameController {
     @FXML private GridPane chessBoard;
     @FXML private Label whiteTimerLabel, blackTimerLabel;
     @FXML private ListView<String> historyList;
 
+
     private BoardView boardView;
     private final Board board = new Board();
-    private final GameManager gameManager = new GameManager(board);
+    private GameManager gameManager = new GameManager(board);
     private Piece selectedPiece;
     private int selectedRow = -1, selectedCol = -1;
     private boolean twoPlayerMode = true;
+    private boolean vsAi;
+    private int aiDepth = 2;  // easy difficulty default
 
     private Timeline timer;
     private Duration whiteTime;
     private Duration blackTime;
 
     private static int timePerPlayerMinutes = 10;
-    public static void setTimePerPlayer(int minutes) {
-        timePerPlayerMinutes = minutes;
-    }
 
+    /**
+     * Initializes the game controller.
+     * @param board       the starting board
+     * @param history     list of moves
+     * @param whiteToMove who starts
+     * @param twoPlayer   true=two humans; false=human vs AI
+     */
     @FXML
-    public void initialize() {
+    public void initGame(Board board,
+                         List<String> history,
+                         boolean whiteToMove,
+                         boolean twoPlayer) {
+        this.twoPlayerMode = twoPlayer;
+        this.gameManager   = new GameManager(board);
+        this.gameManager.setWhiteTurn(whiteToMove);
+
         // Apply saved settings first
         whiteTime = Duration.minutes(timePerPlayerMinutes);
         blackTime = Duration.minutes(timePerPlayerMinutes);
@@ -57,10 +74,14 @@ public class GameController {
         boardView.update(board.getBoard());
         historyList.getItems().clear();
 
-        // Start ticking clock
+        // Start a ticking clock
         timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
         timer.setCycleCount(Animation.INDEFINITE);
         timer.play();
+    }
+
+    public static void setTimePerPlayer(int minutes) {
+        timePerPlayerMinutes = minutes;
     }
 
     private void tick() {
@@ -104,6 +125,7 @@ public class GameController {
             boolean moved = gameManager.attemptMove(move);
 
 
+
             if (moved) {
                 // flip for PvP
                 if (twoPlayerMode) {
@@ -116,14 +138,39 @@ public class GameController {
                     }
                     boardView.update(board.getBoard());
                 }
+                if (vsAi && !gameManager.isWhiteTurn()) {
+                    Move aiMove = new ChessAI(aiDepth).findBestMove(gameManager);
+                    gameManager.attemptMove(aiMove);
+                    boardView.update(gameManager.getBoardWrapper().getBoard());
+                    historyList.getItems().add(Move.notation(aiMove));
+                }
+
                 // record move
                 historyList.getItems().add(Move.notation(move));
                 historyList.scrollTo(historyList.getItems().size() - 1);
+                // move sound
                 SoundManager.play("/resources/sounds/move.wav");
+
+                if (gameManager.isInCheck(!gameManager.isWhiteTurn())) {
+                    // after the move, if opponent is now in check
+                    SoundManager.play("/sounds/check.wav");
+                }
                 boardView.flip();
+
+
+                if (gameManager.isCheckmate()) {
+                    SoundManager.play("/sounds/checkmate.wav");
+                    String winner = gameManager.isWhiteTurn() ? "Black" : "White";
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                            winner + " wins by checkmate!", ButtonType.OK);
+                    alert.showAndWait();
+                    Main.showMainMenu();
+                    return;
+                }
 
             } else {
                 flashRed(cell);
+                SoundManager.play("/resources/sounds/illegal.wav");
             }
             selectedPiece = null;
             selectedRow = -1;
@@ -138,4 +185,5 @@ public class GameController {
         pause.setOnFinished(e -> cell.getChildren().remove(overlay));
         pause.play();
     }
+
 }

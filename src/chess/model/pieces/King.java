@@ -1,12 +1,14 @@
 package chess.model.pieces;
 
+import chess.view.BoardView;
 import chess.model.Move;
 import chess.model.Piece;
 
 public class King extends Piece {
 
-    public King(boolean isWhite, String imagePath) {
-        super(isWhite, imagePath);
+    public King(boolean isWhite) {
+        super(isWhite,String.format("/images/%s/%s_rook.png", BoardView.getPieceStyle(),
+                isWhite ? "white" : "black"));
     }
 
     @Override

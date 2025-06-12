@@ -42,6 +42,12 @@ public class BoardView {
         pieceStyle = style.toLowerCase();
     }
 
+    /** So other code can read the active style folder. */
+    public static String getPieceStyle() {
+        return pieceStyle;
+    }
+
+
     private boolean flipped = false;
 
     /**

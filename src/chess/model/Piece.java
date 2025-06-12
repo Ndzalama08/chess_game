@@ -13,7 +13,7 @@ public abstract class Piece {
     protected int col;
     private boolean hasMoved = false;
 
-    public Piece(boolean isWhite, String imagePath) {
+    protected Piece(boolean isWhite, String imagePath) {
         this.isWhite = isWhite;
 
         InputStream stream = getClass().getResourceAsStream(imagePath);
@@ -24,6 +24,11 @@ public abstract class Piece {
         this.pieceImage = new ImageView(new Image(stream));
         this.pieceImage.setFitWidth(60);
         this.pieceImage.setFitHeight(60);
+    }
+
+    public Piece(boolean isWhite) {
+        // stub, not used
+        this(isWhite, "");
     }
 
     public boolean isWhite() {
