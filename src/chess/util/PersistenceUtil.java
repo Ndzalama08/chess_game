@@ -3,6 +3,9 @@ package chess.util;
 import chess.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sun.scenario.Settings;
+import javafx.scene.paint.Color;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -13,10 +16,48 @@ public final class PersistenceUtil {
     private static Map<String,User> users = new HashMap<>();
     private static final Gson gson = new Gson();
 
+    private static Settings settings;
+    private static final File SETTINGS_FILE = new File("settings.json");
+
+    static {
+        loadSettings();
+    }
     static {
         loadUsers();
     }
 
+    public static class Settings {
+        public Color lightTileColor = Color.BEIGE;
+        public Color darkTileColor = Color.SADDLEBROWN;
+        public int timePerPlayer = 10;
+        public String pieceStyle = "Classic";
+        public boolean soundsEnabled = true;
+    }
+
+    private static void loadSettings() {
+        if (!SETTINGS_FILE.exists()) {
+            settings = new Settings();
+            return;
+        }
+        try (Reader r = new FileReader(SETTINGS_FILE)) {
+            settings = new Gson().fromJson(r, Settings.class);
+        } catch (IOException e) {
+            settings = new Settings();
+        }
+    }
+
+    public static Settings getSettings() {
+        return settings;
+    }
+
+    public static void saveSettings(Settings s) {
+        settings = s;
+        try (Writer w = new FileWriter(SETTINGS_FILE)) {
+            new Gson().toJson(settings, w);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     //private constructor so it cant be initialized
     private PersistenceUtil() {}
 

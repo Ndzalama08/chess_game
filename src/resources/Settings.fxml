@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="chess.controller.SettingsController"
+            prefWidth="500" prefHeight="400">
+    <center>
+        <VBox spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Board Colors -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Light Tile Color:"/>
+                <ColorPicker fx:id="lightColorPicker" />
+                <Label text="Dark Tile Color:"/>
+                <ColorPicker fx:id="darkColorPicker" />
+            </HBox>
+
+            <!-- Time per player -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Time per player (min):"/>
+                <Spinner fx:id="timeSpinner" prefWidth="80" />
+            </HBox>
+
+            <!-- Piece Style -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Piece Style:"/>
+                <ComboBox fx:id="styleComboBox" prefWidth="150" />
+            </HBox>
+
+            <!-- Sound Toggle -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Sounds:"/>
+                <CheckBox fx:id="soundCheckBox" text="Enable Sound" />
+            </HBox>
+
+            <!-- Buttons -->
+            <HBox spacing="20" alignment="CENTER_RIGHT">
+                <Button text="Save" onAction="#onSave" />
+                <Button text="Cancel" onAction="#onCancel" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,17 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:controller="chess.controller.GameController"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            prefWidth="600" prefHeight="600">
+            fx:controller="chess.controller.GameController">
 
-    <GridPane fx:id="chessBoard"
-              layoutX="0" layoutY="0"
-              AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
-              AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0"
-              alignment="CENTER"
-              gridLinesVisible="false" />
-</AnchorPane>
+    <top>
+        <HBox spacing="50" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label fx:id="whiteTimerLabel" text="White: 10:00" styleClass="timer"/>
+            <Label fx:id="blackTimerLabel" text="Black: 10:00" styleClass="timer"/>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="10">
+            <!-- Board -->
+            <GridPane fx:id="chessBoard"/>
+
+            <!-- Inlined Move History -->
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <Label text="Move History" styleClass="title"/>
+                <ListView fx:id="historyList" prefWidth="150"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
