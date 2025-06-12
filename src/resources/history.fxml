@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+    <AnchorPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="chess.controller.HistoryController">
+
+        <Label text="Move History" styleClass="title" />
+        <ListView fx:id="historyList" prefWidth="150" />
+    </AnchorPane>
