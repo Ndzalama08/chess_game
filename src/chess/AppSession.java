@@ -23,4 +23,6 @@ public final class AppSession {
     public static boolean isLoggedIn() {
         return currentUser != null;
     }
+
+
 }

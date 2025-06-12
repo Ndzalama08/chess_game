@@ -43,4 +43,5 @@ public class MainMenuController {
         AppSession.logout();
         Main.showLogin();
     }
+
 }
