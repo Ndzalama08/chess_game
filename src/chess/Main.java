@@ -15,7 +15,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
         primaryStage.setTitle("Chess Game");
-        showLogin();            // start at login screen
+        showBoard();            // start at login screen
         primaryStage.show();
     }
 
@@ -35,7 +35,7 @@ public class Main extends Application {
 
     // Load and display main_menu.fxml
     public static void showMainMenu() {
-        loadScene("/resources/main_menu.fxml", 600, 400);
+        loadScene("/mainMenu.fxml", 600, 400);
     }
 
     // Load and display board.fxml
@@ -45,7 +45,7 @@ public class Main extends Application {
 
     // Load and display settings.fxml
     public static void showSettings() {
-        loadScene("/resources/settings.fxml", 500, 400);
+        loadScene("/resources/Settings.fxml", 500, 400);
     }
 
     // Generic helper to switch scenes

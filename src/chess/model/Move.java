@@ -12,5 +12,15 @@ public class Move {
         this.toRow = toRow;
         this.toCol = toCol;
     }
+
+    public static String notation(Move m) {
+        char fromFile = (char) ('a' + m.fromCol);
+        char toFile = (char) ('a' + m.toCol);
+        int fromRank = 8 - m.fromRow;
+        int toRank = 8 - m.toRow;
+        return "" + fromFile + fromRank + "→" + toFile + toRank;
+    }
+
+
 }
 
