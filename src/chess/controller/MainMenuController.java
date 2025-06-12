@@ -6,8 +6,8 @@ import chess.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.event.ActionEvent;
 
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 public class MainMenuController {
@@ -24,12 +24,25 @@ public class MainMenuController {
             welcomeLabel.setText("Welcome, " + current.getDisplayName() + "!");
         }
     }
-
     @FXML
-    private void onPlayPvP() {
-        Main.showBoard();       // assumes BoardController handles PvP and flipping
+    private void onPlayPvP(ActionEvent event) {
+        // two-player human vs. human
+        try {
+            Main.startMatch(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    @FXML
+    private void onPlayAI(ActionEvent event) {
+        // human vs. AI
+        try {
+            Main.startMatch(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @FXML
@@ -43,8 +56,5 @@ public class MainMenuController {
         Main.showLogin();
     }
 
-    @FXML
-    public void onPlayAI(ActionEvent e) throws IOException {
-        Main.startGame(false);
-    }
+
 }
