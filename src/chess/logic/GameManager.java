@@ -4,7 +4,10 @@ import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
 import chess.model.pieces.King;
+import chess.model.pieces.Pawn;
+import chess.model.pieces.Queen;
 import chess.util.MoveValidator;
+import javafx.scene.control.ButtonType;
 
 public class GameManager {
     private final Board board;
@@ -71,7 +74,10 @@ public class GameManager {
 
 
         // handle special moves
-        if (MoveValidator.isCastling(m, b)) {
+        if (MoveValidator.isPromotion(m, board.getBoard())) {
+            performPromotion(m);
+        }
+        else if (MoveValidator.isCastling(m, b)) {
             performCastling(m);
         } else if (MoveValidator.isEnPassant(m, b)) {
             performEnPassant(m);
@@ -82,6 +88,7 @@ public class GameManager {
         }
 
         // record lastMove for en passant checks
+        p.markMoved();
         lastMove = m;
         whiteTurn = !whiteTurn;
         return true;
@@ -106,6 +113,22 @@ public class GameManager {
         b[m.fromRow][newRookCol] = rook;
         b[m.fromRow][rookCol] = null;
     }
+
+    private void performPromotion(Move m) {
+        Piece[][] b = board.getBoard();
+        Pawn pawn = (Pawn) b[m.fromRow][m.fromCol];
+        b[m.fromRow][m.fromCol] = null;
+
+        javafx.scene.control.Dialog<ButtonType> dialog = new javafx.scene.control.Dialog<ButtonType>();
+        dialog.setTitle("Promotion");
+        dialog.setHeaderText("Promotion");
+
+        Piece newPiece = new Queen(pawn.isWhite(),"");
+        newPiece.setPosition(m.toRow, m.toCol);
+        b[m.toRow][m.toCol] = newPiece;
+        newPiece.markMoved();
+    }
+
 
     /**
      * Captures the pawn en passant
