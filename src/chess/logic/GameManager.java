@@ -69,6 +69,7 @@ public class GameManager {
         Piece p = b[m.fromRow][m.fromCol];
         Piece dest = b[m.toRow][m.toCol];
 
+
         // handle special moves
         if (MoveValidator.isCastling(m, b)) {
             performCastling(m);

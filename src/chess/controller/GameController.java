@@ -1,3 +1,4 @@
+// GameController.java
 package chess.controller;
 
 import chess.Main;
@@ -5,6 +6,7 @@ import chess.logic.GameManager;
 import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
+import chess.util.SoundManager;
 import chess.view.BoardView;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -15,52 +17,52 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class GameController {
-    @FXML
-    private GridPane chessBoard;
+    @FXML private GridPane chessBoard;
+    @FXML private Label whiteTimerLabel, blackTimerLabel;
+    @FXML private ListView<String> historyList;
+
     private BoardView boardView;
-    // fx:id="historyPane"
-    @FXML
-    private Label whiteTimerLabel, blackTimerLabel;
-    @FXML
-    private ListView<String> historyList;
-
-    private Timeline timer;
-    private Duration whiteTime = Duration.minutes(10);
-    private Duration blackTime = Duration.minutes(10);
-
     private final Board board = new Board();
     private final GameManager gameManager = new GameManager(board);
-
-    private Piece selectedPiece = null;
+    private Piece selectedPiece;
     private int selectedRow = -1, selectedCol = -1;
     private boolean twoPlayerMode = true;
 
+    private Timeline timer;
+    private Duration whiteTime;
+    private Duration blackTime;
 
+    private static int timePerPlayerMinutes = 10;
+    public static void setTimePerPlayer(int minutes) {
+        timePerPlayerMinutes = minutes;
+    }
 
     @FXML
     public void initialize() {
+        // Apply saved settings first
+        whiteTime = Duration.minutes(timePerPlayerMinutes);
+        blackTime = Duration.minutes(timePerPlayerMinutes);
+        updateLabel(whiteTimerLabel, "White", whiteTime);
+        updateLabel(blackTimerLabel, "Black", blackTime);
 
+        // Initialize board view with click callback
         boardView = new BoardView(chessBoard, this::handleClick);
         boardView.update(board.getBoard());
-        resetTimers();
         historyList.getItems().clear();
 
-
-        // Setup timer to tick every second
+        // Start ticking clock
         timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
         timer.setCycleCount(Animation.INDEFINITE);
         timer.play();
     }
 
-    // timer methods
     private void tick() {
         if (gameManager.isWhiteTurn()) {
             whiteTime = whiteTime.subtract(Duration.seconds(1));
@@ -74,9 +76,9 @@ public class GameController {
     }
 
     private void updateLabel(Label lbl, String name, Duration time) {
-        long minutes = (long) time.toMinutes();
-        long seconds = (long) (time.toSeconds() % 60);
-        lbl.setText(String.format("%s: %02d:%02d", name, minutes, seconds));
+        long mins = (long) time.toMinutes();
+        long secs = (long) (time.toSeconds() % 60);
+        lbl.setText(String.format("%s: %02d:%02d", name, mins, secs));
     }
 
     private void timeExpired(boolean whiteExpired) {
@@ -88,65 +90,52 @@ public class GameController {
         Main.showMainMenu();
     }
 
-    private void resetTimers() {
-        whiteTime = Duration.minutes(10);
-        blackTime = Duration.minutes(10);
-        updateLabel(whiteTimerLabel, "White", whiteTime);
-        updateLabel(blackTimerLabel, "Black", blackTime);
-    }
-
-
-
-    private void handleClick(int row, int col, StackPane square) {
+    private void handleClick(int row, int col, StackPane cell) {
         Piece clicked = board.getBoard()[row][col];
-
         if (selectedPiece == null) {
-            // 1) Select a piece
             if (clicked != null && clicked.isWhite() == gameManager.isWhiteTurn()) {
                 selectedPiece = clicked;
                 selectedRow = row;
                 selectedCol = col;
-                // highlight
-                square.setStyle(square.getStyle()
-                        + "-fx-border-color: yellow; -fx-border-width: 3;");
+                cell.setStyle(cell.getStyle() + "-fx-border-color: yellow; -fx-border-width: 3;");
             }
         } else {
-            // 2) Try move via GameManager (runs validation + execution)
             Move move = new Move(selectedRow, selectedCol, row, col);
             boolean moved = gameManager.attemptMove(move);
 
+
             if (moved) {
-                //  Valid: redraw and record history
-                boardView.update(board.getBoard());
-
+                // flip for PvP
                 if (twoPlayerMode) {
-                    boardView.flip();
-                }
 
-                // record history
+                    if (gameManager.isWhiteTurn()) {
+                        // White to move → reset back to White at bottom
+                        boardView.reset();
+                    }else {
+                        boardView.flip();
+                    }
+                    boardView.update(board.getBoard());
+                }
+                // record move
                 historyList.getItems().add(Move.notation(move));
                 historyList.scrollTo(historyList.getItems().size() - 1);
-            } else {
-                // 3b) Invalid: flash red
-                flashRed(square);
-            }
+                SoundManager.play("/resources/sounds/move.wav");
+                boardView.flip();
 
-            // 4) Reset selection (after move or flash)
+            } else {
+                flashRed(cell);
+            }
             selectedPiece = null;
             selectedRow = -1;
             selectedCol = -1;
         }
     }
 
-    private void flashRed(StackPane square) {
-        // Overlay sits on top of the square only temporarily
-        Rectangle overlay = new Rectangle(80, 80);
-        overlay.setFill(Color.rgb(255, 0, 0, 0.5));
-        square.getChildren().add(overlay);
-
+    private void flashRed(StackPane cell) {
+        Rectangle overlay = new Rectangle(80, 80, Color.rgb(255,0,0,0.5));
+        cell.getChildren().add(overlay);
         PauseTransition pause = new PauseTransition(Duration.seconds(0.3));
-        pause.setOnFinished(e -> square.getChildren().remove(overlay));
+        pause.setOnFinished(e -> cell.getChildren().remove(overlay));
         pause.play();
     }
-
 }

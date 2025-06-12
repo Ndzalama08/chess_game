@@ -1,6 +1,7 @@
 // SettingsController.java (src/chess/controller/SettingsController.java)
 package chess.controller;
 
+import chess.AppSession;
 import chess.Main;
 import chess.util.PersistenceUtil;
 import javafx.fxml.FXML;
@@ -18,24 +19,28 @@ public class SettingsController {
     public void initialize() {
         // Load saved settings
         var settings = PersistenceUtil.getSettings();
-        lightColorPicker.setValue(settings.lightTileColor);
-        darkColorPicker.setValue(settings.darkTileColor);
-        timeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 60, settings.timePerPlayer));
+        lightColorPicker.setValue(Color.web(settings.lightTileColor));
+        darkColorPicker.setValue(Color.web(settings.darkTileColor));
+
+        timeSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                        1, 60, settings.timePerPlayer));
         styleComboBox.getItems().addAll("Classic", "Modern", "Wood");
         styleComboBox.setValue(settings.pieceStyle);
         soundCheckBox.setSelected(settings.soundsEnabled);
     }
 
     @FXML
-    private void onSave() {
+    public void onSave() {
         var settings = PersistenceUtil.getSettings();
-        settings.lightTileColor = lightColorPicker.getValue();
-        settings.darkTileColor = darkColorPicker.getValue();
+        settings.lightTileColor = lightColorPicker.getValue().toString();
+        settings.darkTileColor = darkColorPicker.getValue().toString();
         settings.timePerPlayer = timeSpinner.getValue();
         settings.pieceStyle = styleComboBox.getValue();
         settings.soundsEnabled = soundCheckBox.isSelected();
 
         PersistenceUtil.saveSettings(settings);
+
         // Apply immediately
         Main.applySettings();
         Main.showMainMenu();
