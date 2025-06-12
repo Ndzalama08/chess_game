@@ -1,5 +1,7 @@
 package chess.util;
 
+import chess.logic.GameManager;
+import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
 import chess.model.pieces.King;
@@ -74,18 +76,53 @@ public final class MoveValidator {
     /**
      * Check castling conditions (no moved king/rook, path clear, no checks).
      */
-    public static boolean canCastle(Move m, Piece[][] board, boolean isWhite) {
-        Piece p = board[m.fromRow][m.fromCol];
+    public static boolean canCastle(Move m, Piece[][] boardArr, boolean isWhite) {
+        // 1) Must be an unmoved King moving two squares in its row
+        Piece p = boardArr[m.fromRow][m.fromCol];
         if (!(p instanceof King) || p.hasMoved()) return false;
-        int dir = (m.toCol > m.fromCol) ? 1 : -1;
-        int rookCol = (dir > 0) ? 7 : 0;
-        Piece rook = board[m.fromRow][rookCol];
+        int dir = (m.toCol > m.fromCol) ? +1 : -1;
+        if (m.fromRow != m.toRow || Math.abs(m.toCol - m.fromCol) != 2) return false;
+
+        // 2) Find and validate the rook
+        int rookCol = (dir > 0 ? 7 : 0);
+        Piece rook = boardArr[m.fromRow][rookCol];
         if (!(rook instanceof Rook) || rook.hasMoved()) return false;
-        // path clear
+
+        // 3) Ensure all squares between King and Rook are empty
         for (int c = m.fromCol + dir; c != rookCol; c += dir) {
-            if (board[m.fromRow][c] != null) return false;
+            if (boardArr[m.fromRow][c] != null) return false;
         }
 
+        // 4) Capture a deep‐copy of the board array
+        BoardState snap = BoardState.capture(boardArr);
+
+        // 5) Wrap that array in a real Board
+        Board simulatedBoard = new Board(snap.getBoard());
+
+        // 6) Create a temp GameManager on the clone
+        GameManager sim = new GameManager(simulatedBoard);
+        sim.setWhiteTurn(isWhite);
+
+        // 7) Test original square—cannot already be in check
+        if (sim.isInCheck(isWhite)) return false;
+
+        // 8) Simulate king moving one square toward rook
+        snap.move(m.fromRow, m.fromCol,
+                m.fromRow, m.fromCol + dir);
+        simulatedBoard = new Board(snap.getBoard());
+        sim = new GameManager(simulatedBoard);
+        sim.setWhiteTurn(isWhite);
+        if (sim.isInCheck(isWhite)) return false;
+
+        // 9) Simulate the final castled square
+        snap.move(m.fromRow, m.fromCol + dir,
+                m.toRow, m.toCol);
+        simulatedBoard = new Board(snap.getBoard());
+        sim = new GameManager(simulatedBoard);
+        sim.setWhiteTurn(isWhite);
+        if (sim.isInCheck(isWhite)) return false;
+
+        // All clear—castling allowed
         return true;
     }
 

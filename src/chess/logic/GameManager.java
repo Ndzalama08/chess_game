@@ -3,19 +3,32 @@ package chess.logic;
 import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
-import chess.model.pieces.King;
-import chess.model.pieces.Pawn;
-import chess.model.pieces.Queen;
+import chess.model.pieces.*;
 import chess.util.MoveValidator;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 
-public class GameManager {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class GameManager implements Cloneable {
     private final Board board;
     private boolean whiteTurn = true;
     private Move lastMove = null;   // track for en passant
 
     public GameManager(Board board) {
         this.board = board;
+    }
+
+    /** Allow simulations to override whose turn it is. */
+    public void setWhiteTurn(boolean whiteTurn) {
+        this.whiteTurn = whiteTurn;
+    }
+
+    /** Optional: expose internal Board if needed by callers. */
+    public Board getBoardWrapper() {
+        return board;
     }
 
     /**
@@ -44,7 +57,7 @@ public class GameManager {
             if (!MoveValidator.canEnPassant(m, b, lastMove)) return false;
         }
         // 4c) Promotion (optional UI pop-up later)
-        // if (MoveValidator.isPromotion(m, b)) { ... }
+        if (MoveValidator.isPromotion(m, b)) {  }
 
         // 5) Must not leave own king in check
         //    simulate the move
@@ -82,7 +95,7 @@ public class GameManager {
         } else if (MoveValidator.isEnPassant(m, b)) {
             performEnPassant(m);
         } else {
-            // normal move (and promotion when implemented)
+            // normal move
             b[m.toRow][m.toCol] = p;
             b[m.fromRow][m.fromCol] = null;
         }
@@ -117,13 +130,25 @@ public class GameManager {
     private void performPromotion(Move m) {
         Piece[][] b = board.getBoard();
         Pawn pawn = (Pawn) b[m.fromRow][m.fromCol];
+        // remove the pawn
         b[m.fromRow][m.fromCol] = null;
 
-        javafx.scene.control.Dialog<ButtonType> dialog = new javafx.scene.control.Dialog<ButtonType>();
-        dialog.setTitle("Promotion");
-        dialog.setHeaderText("Promotion");
+        // Ask user which piece:
+        ChoiceDialog<String> dlg = new ChoiceDialog<>("Queen",
+                List.of("Queen","Rook","Bishop","Knight"));
+        dlg.setTitle("Pawn Promotion");
+        dlg.setHeaderText("Choose a piece to promote to:");
+        Optional<String> result = dlg.showAndWait();
+        String choice = result.orElse("Queen");
 
-        Piece newPiece = new Queen(pawn.isWhite(),"");
+        Piece newPiece = switch (choice) {
+            case "Rook" -> new Rook(pawn.isWhite());
+            case "Bishop" -> new Bishop(pawn.isWhite());
+            case "Knight" -> new Knight(pawn.isWhite());
+            default -> new Queen(pawn.isWhite());
+        };
+
+        // place the new piece
         newPiece.setPosition(m.toRow, m.toCol);
         b[m.toRow][m.toCol] = newPiece;
         newPiece.markMoved();
@@ -222,8 +247,47 @@ public class GameManager {
         return inCheck && !canMove;
     }
 
-
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
+    /**
+     * Generate all legal moves for the given side without mutating the real game.
+     */
+    public List<Move> generateLegalMoves(boolean forWhite) {
+        List<Move> moves = new ArrayList<>();
+        Piece[][] b = board.getBoard();
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = b[r][c];
+                if (p != null && p.isWhite() == forWhite) {
+                    // try every target square
+                    for (int tr = 0; tr < 8; tr++) {
+                        for (int tc = 0; tc < 8; tc++) {
+                            Move m = new Move(r, c, tr, tc);
+                            if (basicValidation(m)) {
+                                moves.add(m);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+    /**
+            * Create a deep‐copy of this GameManager: clones the board, turn, and lastMove.
+            */
+    @Override
+    public GameManager clone() {
+        // 1) Deep‐copy the board array via its constructor
+        Board boardCopy = new Board(board.getBoard());
+        // 2) Build a new manager
+        GameManager copy = new GameManager(boardCopy);
+        // 3) Copy turn and last‐move
+        copy.whiteTurn = this.whiteTurn;
+        copy.lastMove  = this.lastMove;
+        return copy;
+    }
+
 }

@@ -1,5 +1,7 @@
 package chess;
 
+import chess.model.Board;
+import chess.model.GameState;
 import chess.util.PersistenceUtil;
 import chess.controller.GameController;
 import chess.util.SoundManager;
@@ -12,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Main extends Application {
     private static Stage primaryStage;
@@ -27,6 +30,17 @@ public class Main extends Application {
 
         primaryStage.show();
     }
+    // In Main.java
+    public static void startGame(boolean twoPlayerMode) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/Board.fxml"));
+        Parent root = loader.load();
+        primaryStage.setScene(new Scene(root));
+        GameController ctrl = loader.getController();
+        // pass twoPlayerMode directly here:
+        ctrl.initGame(new Board(), List.of(), true, twoPlayerMode);
+        primaryStage.show();
+    }
+
 
     public static void main(String[] args) {
         launch(args);
@@ -70,7 +84,6 @@ public class Main extends Application {
         GameController.setTimePerPlayer(s.timePerPlayer);
         // 3) update sound on/off
         SoundManager.setEnabled(s.soundsEnabled);
-
     }
 
     // Generic helper to switch scenes
@@ -85,5 +98,7 @@ public class Main extends Application {
             e.printStackTrace();
         }
     }
+
+
 }
 
