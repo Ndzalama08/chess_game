@@ -1,15 +1,16 @@
 package chess.util;
 
+import chess.model.GameState;
 import chess.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.scenario.Settings;
 import javafx.scene.paint.Color;
-
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class PersistenceUtil {
     private static final File USER_FILE = new File("users.json");
@@ -18,6 +19,9 @@ public final class PersistenceUtil {
 
     private static Settings settings;
     private static final File SETTINGS_FILE = new File("settings.json");
+
+    private static final File LAST_GAME = new File("lastGame.json");
+    private static final Gson GSON = new Gson();
 
     static {
         loadSettings();
@@ -56,7 +60,6 @@ public final class PersistenceUtil {
         return users.get(username);
     }
 
-
     public static class Settings {
         public String lightTileColor = "#f0d9b5";
         public String darkTileColor = "#b58863";
@@ -93,6 +96,21 @@ public final class PersistenceUtil {
             new Gson().toJson(settings, w);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    public static void saveLastGame(GameState s) {
+        try (Writer w = new FileWriter(LAST_GAME))
+        { GSON.toJson(s, w); }
+        catch (IOException e) { e.printStackTrace(); }
+    }
+
+    public static Optional<GameState> loadLastGame() {
+        if (!LAST_GAME.exists()) return Optional.empty();
+        try (Reader r = new FileReader(LAST_GAME)) {
+            return Optional.of(GSON.fromJson(r, GameState.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 
