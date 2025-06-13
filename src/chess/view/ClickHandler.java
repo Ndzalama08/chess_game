@@ -1,4 +1,4 @@
-package chess;
+package chess.view;
 
 import javafx.scene.layout.StackPane;
 

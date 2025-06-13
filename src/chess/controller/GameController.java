@@ -2,6 +2,7 @@
 package chess.controller;
 
 import chess.Main;
+import chess.logic.ChessAI;
 import chess.logic.GameManager;
 import chess.model.Board;
 import chess.model.Move;
@@ -23,29 +24,44 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.util.List;
+
 public class GameController {
     @FXML private GridPane chessBoard;
     @FXML private Label whiteTimerLabel, blackTimerLabel;
     @FXML private ListView<String> historyList;
 
+
     private BoardView boardView;
-    private final Board board = new Board();
-    private final GameManager gameManager = new GameManager(board);
+    private GameManager gameManager;
     private Piece selectedPiece;
     private int selectedRow = -1, selectedCol = -1;
     private boolean twoPlayerMode = true;
+    private boolean vsAi;
+    private int aiDepth = 2;  // easy difficulty default
 
     private Timeline timer;
     private Duration whiteTime;
     private Duration blackTime;
 
     private static int timePerPlayerMinutes = 10;
-    public static void setTimePerPlayer(int minutes) {
-        timePerPlayerMinutes = minutes;
-    }
 
+    /**
+     * Initializes the game controller.
+     * @param board       the starting board
+     * @param history     list of moves
+     * @param whiteToMove who starts
+     * @param twoPlayer   true=two humans; false=human vs. AI
+     */
     @FXML
-    public void initialize() {
+    public void initGame(Board board,
+                         List<String> history,
+                         boolean whiteToMove,
+                         boolean twoPlayer) {
+        this.twoPlayerMode = twoPlayer;
+        this.gameManager   = new GameManager(board);
+        this.gameManager.setWhiteTurn(whiteToMove);
+
         // Apply saved settings first
         whiteTime = Duration.minutes(timePerPlayerMinutes);
         blackTime = Duration.minutes(timePerPlayerMinutes);
@@ -57,10 +73,14 @@ public class GameController {
         boardView.update(board.getBoard());
         historyList.getItems().clear();
 
-        // Start ticking clock
+        // Start a ticking clock
         timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
         timer.setCycleCount(Animation.INDEFINITE);
         timer.play();
+    }
+
+    public static void setTimePerPlayer(int minutes) {
+        timePerPlayerMinutes = minutes;
     }
 
     private void tick() {
@@ -91,45 +111,111 @@ public class GameController {
     }
 
     private void handleClick(int row, int col, StackPane cell) {
-        Piece clicked = board.getBoard()[row][col];
+        Piece[][] b = gameManager.getBoardWrapper().getBoard();
+        Piece clicked = b[row][col];
+
         if (selectedPiece == null) {
+            // 1) SELECT PHASE
             if (clicked != null && clicked.isWhite() == gameManager.isWhiteTurn()) {
                 selectedPiece = clicked;
-                selectedRow = row;
-                selectedCol = col;
-                cell.setStyle(cell.getStyle() + "-fx-border-color: yellow; -fx-border-width: 3;");
+                selectedRow   = row;
+                selectedCol   = col;
+                // highlight selected cell
+                cell.setStyle(cell.getStyle()
+                        + "-fx-border-color: yellow; -fx-border-width: 3;");
             }
-        } else {
-            Move move = new Move(selectedRow, selectedCol, row, col);
-            boolean moved = gameManager.attemptMove(move);
-
-
-            if (moved) {
-                // flip for PvP
-                if (twoPlayerMode) {
-
-                    if (gameManager.isWhiteTurn()) {
-                        // White to move → reset back to White at bottom
-                        boardView.reset();
-                    }else {
-                        boardView.flip();
-                    }
-                    boardView.update(board.getBoard());
-                }
-                // record move
-                historyList.getItems().add(Move.notation(move));
-                historyList.scrollTo(historyList.getItems().size() - 1);
-                SoundManager.play("/resources/sounds/move.wav");
-                boardView.flip();
-
-            } else {
-                flashRed(cell);
-            }
-            selectedPiece = null;
-            selectedRow = -1;
-            selectedCol = -1;
+            return;
         }
+
+        // 2) MOVE PHASE
+        Move move = new Move(selectedRow, selectedCol, row, col);
+        Piece dest = b[row][col];
+        boolean moved = gameManager.attemptMove(move);
+
+        if (moved) {
+            // --- Playback sounds ---
+            if (dest != null) {
+                SoundManager.play("/resources/sounds/capture.wav");
+            } else {
+                SoundManager.play("/resources/sounds/move.wav");
+            }
+
+            // update view & history
+            boardView.update(b);
+            historyList.getItems().add(Move.notation(move));
+            historyList.scrollTo(historyList.getItems().size() - 1);
+
+            // --- Check/Checkmate sounds ---
+            boolean opponentInCheck = gameManager.isInCheck(!gameManager.isWhiteTurn());
+            if (opponentInCheck) {
+                SoundManager.play("/resources/sounds/check.wav");
+            }
+            if (gameManager.isCheckmate()) {
+                SoundManager.play("/resources/sounds/checkmate.wav");
+                String winner = gameManager.isWhiteTurn() ? "Black" : "White";
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        winner + " wins by checkmate!", ButtonType.OK);
+                alert.showAndWait();
+                Main.showMainMenu();
+                return;
+            }
+
+            // --- Board flip/reset ---
+            if (twoPlayerMode) {
+                // in PvP: flip for Black, reset for White
+                if (gameManager.isWhiteTurn()) {
+                    boardView.flip();
+                } else {
+                    boardView.reset();
+                }
+            } else {
+                // in PvAI: always ensure human (White) at bottom
+                boardView.flip();
+            }
+
+            // --- AI response (if any) ---
+            if (!twoPlayerMode && !gameManager.isWhiteTurn()) {
+                Move aiMove = new ChessAI(aiDepth).findBestMove(gameManager);
+                gameManager.attemptMove(aiMove);
+
+                // sound + view + history for AI
+                SoundManager.play("/resources/sounds/move.wav");
+                boardView.update(b);
+                historyList.getItems().add(Move.notation(aiMove));
+                historyList.scrollTo(historyList.getItems().size() - 1);
+
+                // check audio after AI move
+                boolean humanInCheck = gameManager.isInCheck(!gameManager.isWhiteTurn());
+                if (humanInCheck) {
+                    SoundManager.play("/resources/sounds/check.wav");
+                }
+                if (gameManager.isCheckmate()) {
+                    SoundManager.play("/resources/sounds/checkmate.wav");
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                            "AI wins by checkmate!", ButtonType.OK);
+                    alert.showAndWait();
+                    Main.showMainMenu();
+                    return;
+                }
+            }
+
+        } else {
+            // invalid move
+            flashRed(cell);
+            SoundManager.play("/resources/sounds/illegal.wav");
+        }
+
+        // 3) CLEAN UP selection
+        selectedPiece = null;
+        selectedRow   = -1;
+        selectedCol   = -1;
     }
+
+    @FXML
+    private void mainMenu() {
+        Main.showMainMenu();
+    }
+
 
     private void flashRed(StackPane cell) {
         Rectangle overlay = new Rectangle(80, 80, Color.rgb(255,0,0,0.5));
@@ -138,4 +224,5 @@ public class GameController {
         pause.setOnFinished(e -> cell.getChildren().remove(overlay));
         pause.play();
     }
+
 }
