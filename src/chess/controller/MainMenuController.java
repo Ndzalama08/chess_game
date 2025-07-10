@@ -4,7 +4,6 @@ import chess.AppSession;
 import chess.Main;
 import chess.model.User;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
 
@@ -12,10 +11,6 @@ import java.io.IOException;
 
 public class MainMenuController {
     @FXML private Label welcomeLabel;
-    @FXML private Button playPvPBtn;
-    @FXML private Button playAIBtn;
-    @FXML private Button settingsBtn;
-    @FXML private Button logoutBtn;
 
     // Called by FXMLLoader
     public void initialize() {

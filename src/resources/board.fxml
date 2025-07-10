@@ -9,20 +9,20 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="chess.controller.GameController">
+            fx:controller="chess.controller.GameController" prefHeight="700" prefWidth="850">
 
     <top>
-        <HBox spacing="50" alignment="CENTER">
+        <HBox spacing="50" alignment="CENTER" >
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Label fx:id="whiteTimerLabel" text="White: 10:00" styleClass="timer"/>
+            <Label fx:id="whiteTimerLabel" text="White: 10:00"  styleClass="timer"/>
             <Label fx:id="blackTimerLabel" text="Black: 10:00" styleClass="timer"/>
         </HBox>
     </top>
 
     <center>
-        <HBox spacing="10">
+        <HBox spacing="10" maxHeight="700" maxWidth="800" alignment="CENTER" fillHeight="true">
             <!-- Board -->
             <GridPane fx:id="chessBoard"/>
 

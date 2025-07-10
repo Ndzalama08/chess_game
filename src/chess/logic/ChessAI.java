@@ -3,8 +3,6 @@ package chess.logic;
 import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
-import chess.logic.GameManager;
-import java.util.List;
 
 public class ChessAI {
     private final int maxDepth;

@@ -48,3 +48,9 @@
 #login_pane{
     -fx-background-color: white;
 }
+#whiteTimerLabel{
+    -fx-font-size: 2.5em;
+}
+#blackTimerLabel{
+    -fx-font-size: 2.5em;
+}
