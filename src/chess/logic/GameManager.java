@@ -41,21 +41,24 @@ public class GameManager implements Cloneable {
         // 1) Must move your own piece
         if (p == null || p.isWhite() != whiteTurn) return false;
 
-        // 2) Shape/path valid per piece logic
-        if (!p.isValidMove(m, b)) return false;
+        boolean castling = MoveValidator.isCastling(m, b);
+        boolean enPassant = MoveValidator.isEnPassant(m, b);
+
+        // 2) Shape/path valid per piece logic — special moves (castling, en
+        //    passant) don't match a piece's normal move shape, so they're
+        //    validated separately below instead of falling into this check.
+        if (!castling && !enPassant && !p.isValidMove(m, b)) return false;
 
         // 3) Cannot capture own piece
         Piece dest = b[m.toRow][m.toCol];
         if (dest != null && dest.isWhite() == whiteTurn) return false;
 
         // 4a) Castling
-        if (MoveValidator.isCastling(m, b)) {
-            if (!MoveValidator.canCastle(m, b, whiteTurn)) return false;
-        }
+        if (castling && !MoveValidator.canCastle(m, b, whiteTurn)) return false;
+
         // 4b) En passant
-        if (MoveValidator.isEnPassant(m, b)) {
-            if (!MoveValidator.canEnPassant(m, b, lastMove)) return false;
-        }
+        if (enPassant && !MoveValidator.canEnPassant(m, b, lastMove)) return false;
+
         // 4c) Promotion (optional UI pop-up later)
         if (MoveValidator.isPromotion(m, b)) {  }
 
