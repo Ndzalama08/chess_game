@@ -4,7 +4,6 @@ import chess.model.GameState;
 import chess.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.scenario.Settings;
 import javafx.scene.paint.Color;
 import java.io.*;
 import java.lang.reflect.Type;
