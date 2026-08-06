@@ -11,6 +11,7 @@ public class Board {
     }
 
     public Board(Piece[][] src) {
+        board = new Piece[8][8];
         for (int r = 0; r < 8; r++) {
             System.arraycopy(src[r], 0, board[r], 0, 8);
         }
