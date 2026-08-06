@@ -34,7 +34,7 @@ public class GameManager implements Cloneable {
     /**
      * bundles all pre-move checks
      */
-    private boolean basicValidation(Move m) {
+    private boolean isValid(Move m) {
         Piece[][] b = board.getBoard();
         Piece p = b[m.fromRow][m.fromCol];
 
@@ -77,7 +77,7 @@ public class GameManager implements Cloneable {
      * Also updates lastMove and flips turn.
      */
     public boolean attemptMove(Move m) {
-        if (!basicValidation(m)) {
+        if (!isValid(m)) {
             return false;
         }
 
@@ -264,7 +264,7 @@ public class GameManager implements Cloneable {
                     for (int tr = 0; tr < 8; tr++) {
                         for (int tc = 0; tc < 8; tc++) {
                             Move m = new Move(r, c, tr, tc);
-                            if (basicValidation(m)) {
+                            if (isValid(m)) {
                                 moves.add(m);
                             }
                         }
