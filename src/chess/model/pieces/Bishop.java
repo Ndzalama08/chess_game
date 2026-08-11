@@ -2,14 +2,12 @@ package chess.model.pieces;
 
 import chess.model.Move;
 import chess.model.Piece;
-import chess.view.BoardView;
 
 
 public class Bishop extends Piece {
 
     public Bishop(boolean isWhite) {
-        super(isWhite,String.format("/images/%s/%s_rook.png", BoardView.getPieceStyle(),
-                        isWhite ? "white" : "black"));
+        super(isWhite);
     }
 
     @Override

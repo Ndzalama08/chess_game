@@ -1,14 +1,12 @@
 // Queen.java
 package chess.model.pieces;
 
-import chess.view.BoardView;
 import chess.model.Move;
 import chess.model.Piece;
 
 public class Queen extends Piece {
     public Queen(boolean isWhite) {
-        super(isWhite,String.format("/images/%s/%s_rook.png", BoardView.getPieceStyle(),
-                isWhite ? "white" : "black"));
+        super(isWhite);
     }
 
     @Override
