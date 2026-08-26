@@ -1,6 +1,9 @@
 ### Maven ###
 target/
 
+### App data (real user credentials — never commit) ###
+users.json
+
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
