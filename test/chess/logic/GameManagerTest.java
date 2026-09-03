@@ -3,6 +3,8 @@ package chess.logic;
 import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
+import chess.model.pieces.Pawn;
+import chess.model.pieces.Queen;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,5 +54,18 @@ class GameManagerTest {
 
         assertTrue(gm.attemptMove(new Move(3, 4, 2, 3))); // exd6 en passant
         assertNull(arr[3][3], "captured black pawn should be removed");
+    }
+
+    @Test
+    void promotionDefaultsToQueenWithNoChooserSet() {
+        Board board = new Board();
+        Piece[][] arr = board.getBoard();
+        arr[1][0] = new Pawn(true);
+        arr[1][0].setPosition(1, 0);
+        arr[0][0] = null; // clear so the pawn has somewhere to promote into
+        GameManager gm = new GameManager(board);
+
+        assertTrue(gm.attemptMove(new Move(1, 0, 0, 0)));
+        assertInstanceOf(Queen.class, arr[0][0], "should auto-promote to Queen headlessly");
     }
 }

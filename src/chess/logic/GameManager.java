@@ -5,20 +5,26 @@ import chess.model.Move;
 import chess.model.Piece;
 import chess.model.pieces.*;
 import chess.util.MoveValidator;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
 public class GameManager implements Cloneable {
     private final Board board;
     private boolean whiteTurn = true;
     private Move lastMove = null;   // track for en passant
 
+    // isWhite -> chosen piece name ("Queen"/"Rook"/"Bishop"/"Knight"). Defaults
+    // to auto-Queen so headless callers (AI search, tests) don't need a UI.
+    private Function<Boolean, String> promotionChooser = isWhite -> "Queen";
+
     public GameManager(Board board) {
         this.board = board;
+    }
+
+    public void setPromotionChooser(Function<Boolean, String> promotionChooser) {
+        this.promotionChooser = promotionChooser;
     }
 
     /** Allow simulations to override whose turn it is. */
@@ -136,13 +142,7 @@ public class GameManager implements Cloneable {
         // remove the pawn
         b[m.fromRow][m.fromCol] = null;
 
-        // Ask user which piece:
-        ChoiceDialog<String> dlg = new ChoiceDialog<>("Queen",
-                List.of("Queen","Rook","Bishop","Knight"));
-        dlg.setTitle("Pawn Promotion");
-        dlg.setHeaderText("Choose a piece to promote to:");
-        Optional<String> result = dlg.showAndWait();
-        String choice = result.orElse("Queen");
+        String choice = promotionChooser.apply(pawn.isWhite());
 
         Piece newPiece = switch (choice) {
             case "Rook" -> new Rook(pawn.isWhite());

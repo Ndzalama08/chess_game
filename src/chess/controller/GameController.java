@@ -16,6 +16,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
@@ -61,6 +62,13 @@ public class GameController {
         this.twoPlayerMode = twoPlayer;
         this.gameManager   = new GameManager(board);
         this.gameManager.setWhiteTurn(whiteToMove);
+        this.gameManager.setPromotionChooser(isWhite -> {
+            ChoiceDialog<String> dlg = new ChoiceDialog<>("Queen",
+                    List.of("Queen", "Rook", "Bishop", "Knight"));
+            dlg.setTitle("Pawn Promotion");
+            dlg.setHeaderText("Choose a piece to promote to:");
+            return dlg.showAndWait().orElse("Queen");
+        });
 
         // Apply saved settings first
         whiteTime = Duration.minutes(timePerPlayerMinutes);
