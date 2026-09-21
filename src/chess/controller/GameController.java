@@ -158,15 +158,8 @@ public class GameController {
             if (opponentInCheck) {
                 SoundManager.play("/resources/sounds/check.wav");
             }
-            if (gameManager.isCheckmate()) {
-                SoundManager.play("/resources/sounds/checkmate.wav");
-                String winner = gameManager.isWhiteTurn() ? "Black" : "White";
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        winner + " wins by checkmate!", ButtonType.OK);
-                alert.showAndWait();
-                Main.showMainMenu();
-                return;
-            }
+            String winner = gameManager.isWhiteTurn() ? "Black" : "White";
+            if (handleGameEnd(winner + " wins by checkmate!")) return;
 
             // --- Board flip/reset ---
             if (twoPlayerMode) {
@@ -184,6 +177,11 @@ public class GameController {
             // --- AI response (if any) ---
             if (!twoPlayerMode && !gameManager.isWhiteTurn()) {
                 Move aiMove = new ChessAI(aiDepth).findBestMove(gameManager);
+                if (aiMove == null) {
+                    // No reply exists, so the game is already over.
+                    handleGameEnd("AI wins by checkmate!");
+                    return;
+                }
                 gameManager.attemptMove(aiMove);
 
                 // sound + view + history for AI
@@ -197,14 +195,7 @@ public class GameController {
                 if (humanInCheck) {
                     SoundManager.play("/resources/sounds/check.wav");
                 }
-                if (gameManager.isCheckmate()) {
-                    SoundManager.play("/resources/sounds/checkmate.wav");
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                            "AI wins by checkmate!", ButtonType.OK);
-                    alert.showAndWait();
-                    Main.showMainMenu();
-                    return;
-                }
+                if (handleGameEnd("AI wins by checkmate!")) return;
             }
 
         } else {
@@ -224,6 +215,26 @@ public class GameController {
         Main.showMainMenu();
     }
 
+
+    /**
+     * Announces checkmate or stalemate and returns to the menu. Returns true
+     * when the game is over and the caller should stop processing the move.
+     */
+    private boolean handleGameEnd(String checkmateMessage) {
+        String message;
+        if (gameManager.isCheckmate()) {
+            SoundManager.play("/resources/sounds/checkmate.wav");
+            message = checkmateMessage;
+        } else if (gameManager.isStalemate()) {
+            message = "Draw by stalemate.";
+        } else {
+            return false;
+        }
+
+        new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK).showAndWait();
+        Main.showMainMenu();
+        return true;
+    }
 
     private void flashRed(StackPane cell) {
         Rectangle overlay = new Rectangle(80, 80, Color.rgb(255,0,0,0.5));
