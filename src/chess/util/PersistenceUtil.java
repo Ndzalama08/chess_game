@@ -34,9 +34,27 @@ public final class PersistenceUtil {
     private static void loadUsers() {
         if (!USER_FILE.exists()) return;
         try (Reader r = new FileReader(USER_FILE)) {
-            Type type = new TypeToken<Map<String,User>>(){}.getType();
-            users = gson.fromJson(r, type);
+            users = parseUsers(r);
         } catch (IOException e) { /* ignore for now */ }
+    }
+
+    /**
+     * Reads the user map, falling back to an empty one when the file is blank,
+     * holds JSON null, or is malformed. Gson returns null for the first two and
+     * throws for the third; both used to escape loadUsers and leave the static
+     * users field null, so the next login attempt died on a NullPointerException
+     * - or, when the throw happened, the class failed to initialise at all and
+     * the app never opened.
+     */
+    static Map<String,User> parseUsers(Reader r) {
+        try {
+            Type type = new TypeToken<Map<String,User>>(){}.getType();
+            Map<String,User> loaded = gson.fromJson(r, type);
+            return (loaded != null) ? loaded : new HashMap<>();
+        } catch (RuntimeException e) {
+            // corrupt file: start empty rather than taking the whole app down
+            return new HashMap<>();
+        }
     }
 
     private static void saveUsers() {
