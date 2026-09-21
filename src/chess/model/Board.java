@@ -10,10 +10,13 @@ public class Board {
         initializeBoard(board);
     }
 
+    /** Deep copy: each piece is copied too, so simulations can't mutate the original. */
     public Board(Piece[][] src) {
         board = new Piece[8][8];
         for (int r = 0; r < 8; r++) {
-            System.arraycopy(src[r], 0, board[r], 0, 8);
+            for (int c = 0; c < 8; c++) {
+                board[r][c] = (src[r][c] == null) ? null : src[r][c].copy();
+            }
         }
     }
     public Piece[][] getBoard() {

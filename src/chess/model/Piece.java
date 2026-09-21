@@ -1,6 +1,6 @@
 package chess.model;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable {
     protected boolean isWhite;
     protected int row;
     protected int col;
@@ -38,5 +38,18 @@ public abstract class Piece {
     }
 
     public abstract boolean isValidMove(Move move, Piece[][] board);
+
+    /**
+     * Field-for-field copy, including hasMoved. Board's copy constructor uses
+     * this so simulated games (AI search, castling checks) never mutate the
+     * pieces of the real game.
+     */
+    public Piece copy() {
+        try {
+            return (Piece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Piece is Cloneable", e);
+        }
+    }
 
 }
