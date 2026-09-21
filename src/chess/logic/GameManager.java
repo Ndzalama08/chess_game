@@ -207,6 +207,9 @@ public class GameManager implements Cloneable {
     public boolean isInCheck(boolean whiteToMove) {
         Piece[][] b = board.getBoard();
         int[] kingPos = findKing(whiteToMove, b);
+        // Test positions and partially-set-up boards can lack a king; a side
+        // with no king is not in check rather than a crash.
+        if (kingPos == null) return false;
         return isSquareAttacked(kingPos[0], kingPos[1], !whiteToMove, b);
     }
 
@@ -259,21 +262,29 @@ public class GameManager implements Cloneable {
     public List<Move> generateLegalMoves(boolean forWhite) {
         List<Move> moves = new ArrayList<>();
         Piece[][] b = board.getBoard();
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
-                Piece p = b[r][c];
-                if (p != null && p.isWhite() == forWhite) {
-                    // try every target square
-                    for (int tr = 0; tr < 8; tr++) {
-                        for (int tc = 0; tc < 8; tc++) {
-                            Move m = new Move(r, c, tr, tc);
-                            if (isValid(m)) {
-                                moves.add(m);
+        // isValid() judges moves for whoever is to move, so ask it about the
+        // requested side and put the real turn back afterwards.
+        boolean savedTurn = whiteTurn;
+        whiteTurn = forWhite;
+        try {
+            for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    Piece p = b[r][c];
+                    if (p != null && p.isWhite() == forWhite) {
+                        // try every target square
+                        for (int tr = 0; tr < 8; tr++) {
+                            for (int tc = 0; tc < 8; tc++) {
+                                Move m = new Move(r, c, tr, tc);
+                                if (isValid(m)) {
+                                    moves.add(m);
+                                }
                             }
                         }
                     }
                 }
             }
+        } finally {
+            whiteTurn = savedTurn;
         }
         return moves;
     }
