@@ -213,37 +213,14 @@ public class GameManager implements Cloneable {
         return isSquareAttacked(kingPos[0], kingPos[1], !whiteToMove, b);
     }
 
+    /**
+     * Delegates to generateLegalMoves so castling and en passant count as
+     * escapes: the hand-rolled scan this replaced only tried piece move
+     * shapes, so a position whose sole legal reply was a special move was
+     * wrongly reported as mate or stalemate.
+     */
     public boolean hasLegalMoves(boolean whiteToMove) {
-        Piece[][] b = board.getBoard();
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
-                Piece p = b[r][c];
-                if (p != null && p.isWhite() == whiteToMove) {
-                    for (int tr = 0; tr < 8; tr++) {
-                        for (int tc = 0; tc < 8; tc++) {
-                            Move m = new Move(r, c, tr, tc);
-                            if (!p.isValidMove(m, b)) continue;
-
-                            // simulate
-                            Piece captured = b[tr][tc];
-                            b[tr][tc] = p;
-                            b[r][c] = null;
-
-                            boolean stillInCheck = isInCheck(whiteToMove);
-
-                            // undo
-                            b[r][c] = p;
-                            b[tr][tc] = captured;
-
-                            if (!stillInCheck) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return !generateLegalMoves(whiteToMove).isEmpty();
     }
 
 
@@ -251,6 +228,11 @@ public class GameManager implements Cloneable {
         boolean inCheck = isInCheck(whiteTurn);
         boolean canMove = hasLegalMoves(whiteTurn);
         return inCheck && !canMove;
+    }
+
+    /** Draw: the side to move is not in check but has no legal move. */
+    public boolean isStalemate() {
+        return !isInCheck(whiteTurn) && !hasLegalMoves(whiteTurn);
     }
 
     public boolean isWhiteTurn() {
