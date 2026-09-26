@@ -3,6 +3,7 @@ package chess.controller;
 
 import chess.Main;
 import chess.logic.ChessAI;
+import chess.logic.ChessClock;
 import chess.logic.GameManager;
 import chess.model.Board;
 import chess.model.Move;
@@ -42,8 +43,7 @@ public class GameController {
     private int aiDepth = 2;  // easy difficulty default
 
     private Timeline timer;
-    private Duration whiteTime;
-    private Duration blackTime;
+    private ChessClock clock;
 
     private static int timePerPlayerMinutes = 10;
 
@@ -71,10 +71,8 @@ public class GameController {
         });
 
         // Apply saved settings first
-        whiteTime = Duration.minutes(timePerPlayerMinutes);
-        blackTime = Duration.minutes(timePerPlayerMinutes);
-        updateLabel(whiteTimerLabel, "White", whiteTime);
-        updateLabel(blackTimerLabel, "Black", blackTime);
+        clock = new ChessClock(timePerPlayerMinutes);
+        updateClockLabels();
 
         // Initialize board view with click callback
         boardView = new BoardView(chessBoard, this::handleClick);
@@ -92,30 +90,35 @@ public class GameController {
     }
 
     private void tick() {
-        if (gameManager.isWhiteTurn()) {
-            whiteTime = whiteTime.subtract(Duration.seconds(1));
-            updateLabel(whiteTimerLabel, "White", whiteTime);
-            if (whiteTime.lessThanOrEqualTo(Duration.ZERO)) timeExpired(false);
-        } else {
-            blackTime = blackTime.subtract(Duration.seconds(1));
-            updateLabel(blackTimerLabel, "Black", blackTime);
-            if (blackTime.lessThanOrEqualTo(Duration.ZERO)) timeExpired(true);
+        boolean whiteToMove = gameManager.isWhiteTurn();
+        // tick() reports on the side it charged, so the loser can't be mixed up
+        // the way it was when the two branches passed a hand-written flag.
+        boolean flagFell = clock.tick(whiteToMove);
+        updateClockLabels();
+        if (flagFell) {
+            timeExpired(whiteToMove);
         }
     }
 
-    private void updateLabel(Label lbl, String name, Duration time) {
-        long mins = (long) time.toMinutes();
-        long secs = (long) (time.toSeconds() % 60);
-        lbl.setText(String.format("%s: %02d:%02d", name, mins, secs));
+    private void updateClockLabels() {
+        whiteTimerLabel.setText("White: " + ChessClock.format(clock.getWhiteSeconds()));
+        blackTimerLabel.setText("Black: " + ChessClock.format(clock.getBlackSeconds()));
     }
 
     private void timeExpired(boolean whiteExpired) {
-        timer.stop();
-        String winner = whiteExpired ? "Black" : "White";
+        stopTimer();
+        String winner = ChessClock.winnerOnTime(whiteExpired);
         Alert alert = new Alert(Alert.AlertType.INFORMATION,
                 winner + " wins on time!", ButtonType.OK);
         alert.showAndWait();
         Main.showMainMenu();
+    }
+
+    /** Idempotent: the clock must not outlive the screen that owns it. */
+    private void stopTimer() {
+        if (timer != null) {
+            timer.stop();
+        }
     }
 
     private void handleClick(int row, int col, StackPane cell) {
@@ -212,6 +215,7 @@ public class GameController {
 
     @FXML
     private void mainMenu() {
+        stopTimer();
         Main.showMainMenu();
     }
 
@@ -231,6 +235,7 @@ public class GameController {
             return false;
         }
 
+        stopTimer();
         new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK).showAndWait();
         Main.showMainMenu();
         return true;
