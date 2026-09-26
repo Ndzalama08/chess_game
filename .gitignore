@@ -5,6 +5,10 @@ target/
 users.json
 
 ### IntelliJ IDEA ###
+# Per-developer project config; the Maven pom is the single source of truth for
+# the build, so these only ever show up as churn in `git status`.
+.idea/
+*.iml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
