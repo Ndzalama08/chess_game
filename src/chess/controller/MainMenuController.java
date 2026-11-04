@@ -5,6 +5,7 @@ import chess.Main;
 import chess.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
 
@@ -16,6 +17,8 @@ public class MainMenuController {
     @FXML private Button playAIBtn;
     @FXML private Button settingsBtn;
     @FXML private Button logoutBtn;
+    @FXML private ComboBox<String> difficultyBox;
+    @FXML private ComboBox<String> sideBox;
 
     // Called by FXMLLoader
     public void initialize() {
@@ -23,12 +26,16 @@ public class MainMenuController {
         if (current != null) {
             welcomeLabel.setText("Welcome, " + current.getDisplayName() + "!");
         }
+        difficultyBox.getItems().addAll("Easy", "Medium", "Hard");
+        difficultyBox.setValue("Medium");
+        sideBox.getItems().addAll("Play as White", "Play as Black");
+        sideBox.setValue("Play as White");
     }
     @FXML
     private void onPlayPvP(ActionEvent event) {
         // two-player human vs. human
         try {
-            Main.startMatch(true);
+            Main.startMatch(true, 0, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,7 +45,9 @@ public class MainMenuController {
     private void onPlayAI(ActionEvent event) {
         // human vs. AI
         try {
-            Main.startMatch(false);
+            // search depth = plies the computer looks ahead
+            int depth = difficultyBox.getSelectionModel().getSelectedIndex() + 1;
+            Main.startMatch(false, depth, sideBox.getSelectionModel().getSelectedIndex() == 0);
         } catch (IOException e) {
             e.printStackTrace();
         }

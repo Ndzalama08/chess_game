@@ -8,6 +8,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * BoardView handles drawing the chessboard and pieces,
  * and flips orientation without rotating piece images.
@@ -49,6 +52,16 @@ public class BoardView {
 
 
     private boolean flipped = false;
+    // logical square (row * 8 + col) -> translucent overlay colour
+    private final Map<Integer, Color> marks = new HashMap<>();
+
+    public void mark(int row, int col, Color color) {
+        marks.put(row * 8 + col, color);
+    }
+
+    public void clearMarks() {
+        marks.clear();
+    }
 
     /**
      * @param gridPane  your GridPane fx:id
@@ -80,6 +93,10 @@ public class BoardView {
                 Color bgColor = ((row + col) % 2 == 0) ? lightTile : darkTile;
                 Rectangle bg = new Rectangle(tileSize, tileSize, bgColor);
                 cell.getChildren().add(bg);
+                Color mark = marks.get(row * 8 + col);
+                if (mark != null) {
+                    cell.getChildren().add(new Rectangle(tileSize, tileSize, mark));
+                }
 
                 // piece image
                 Piece p = boardState[row][col];
@@ -105,16 +122,8 @@ public class BoardView {
         }
     }
 
-    /**
-     * Toggle orientation (white-at-bottom vs. black-at-bottom).
-     * Call update(...) again to redraw if needed.
-     */
-    public void flip() {
-        flipped = !flipped;
-    }
-
-    /** Reset to default orientation */
-    public void reset() {
-        flipped = false;
+    /** true = Black's side at the bottom. Takes effect on the next update(). */
+    public void setFlipped(boolean flipped) {
+        this.flipped = flipped;
     }
 }

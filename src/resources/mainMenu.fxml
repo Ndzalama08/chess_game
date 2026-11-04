@@ -10,6 +10,10 @@
           AnchorPane.rightAnchor="50" AnchorPane.topAnchor="50" AnchorPane.bottomAnchor="50" alignment="CENTER">
         <Label fx:id="welcomeLabel" text="Welcome!" styleClass="title" />
         <Button text="Play vs Player" onAction="#onPlayPvP" />
+        <HBox spacing="10" alignment="CENTER">
+            <ComboBox fx:id="difficultyBox" />
+            <ComboBox fx:id="sideBox" />
+        </HBox>
         <Button text="Play vs Computer" onAction="#onPlayAI" />
         <Button text="Settings" onAction="#onSettings" />
         <Button text="Logout" onAction="#onLogout" />
