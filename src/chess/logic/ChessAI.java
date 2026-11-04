@@ -4,6 +4,7 @@ import chess.model.Board;
 import chess.model.Move;
 import chess.model.Piece;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ChessAI {
@@ -23,7 +24,10 @@ public class ChessAI {
         Move best = null;
         int bestScore = maximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        for (Move m : gm.generateLegalMoves(gm.isWhiteTurn())) {
+        List<Move> moves = gm.generateLegalMoves(gm.isWhiteTurn());
+        // equal scores keep the first move found; shuffle so the opening isn't always the same
+        Collections.shuffle(moves);
+        for (Move m : moves) {
             GameManager sim = gm.clone();       // deep-copy manager+board
             sim.attemptMove(m);
             int score = minimax(sim, maxDepth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);

@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.List;
 
 public class Main extends Application {
     private static Stage primaryStage;
@@ -31,12 +30,12 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public static void startMatch(boolean twoPlayerMode) throws IOException {
+    public static void startMatch(boolean twoPlayerMode, int aiDepth, boolean humanWhite) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/board.fxml"));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
         GameController ctrl = loader.getController();
-        ctrl.initGame(new Board(), List.of(), true, twoPlayerMode);
+        ctrl.initGame(new Board(), true, twoPlayerMode, aiDepth, humanWhite);
         primaryStage.centerOnScreen();
         primaryStage.show();
     }
