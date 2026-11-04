@@ -60,23 +60,6 @@ public class Board {
     }
 
 
-    public String[][] exportToIds() {
-        String[][] ids = new String[8][8];
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
-                Piece p = board[r][c];
-                if (p == null) {
-                    ids[r][c] = null;
-                } else {
-                    String color = p.isWhite() ? "w" : "b";
-                    String cls   = p.getClass().getSimpleName().toLowerCase();
-                    ids[r][c] = color + "_" + cls;
-                }
-            }
-        }
-        return ids;
-    }
-
     /**
      * Reconstruct a fresh Board from the given ID grid.
      * All other squares start empty.
