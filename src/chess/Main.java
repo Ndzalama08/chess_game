@@ -32,7 +32,7 @@ public class Main extends Application {
     }
 
     public static void startMatch(boolean twoPlayerMode) throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/resources/Board.fxml"));
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/board.fxml"));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
         GameController ctrl = loader.getController();
@@ -60,12 +60,12 @@ public class Main extends Application {
 
     // Load and display login.fxml
     public static void showLogin() {
-        loadScene("/resources/login.fxml", 400, 300);
+        loadScene("/login.fxml", 400, 300);
     }
 
     // Load and display signup.fxml
     public static void showSignup() {
-        loadScene("/resources/signup.fxml", 400, 350);
+        loadScene("/signup.fxml", 400, 350);
     }
 
     // Load and display main_menu.fxml
@@ -75,7 +75,7 @@ public class Main extends Application {
 
     // Load and display settings.fxml
     public static void showSettings() {
-        loadScene("/resources/Settings.fxml", 500, 400);
+        loadScene("/Settings.fxml", 500, 400);
     }
 
     public static void applySettings() {
@@ -125,7 +125,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             Parent root = loader.load();
             Scene scene = new Scene(root, width, height);
-            scene.getStylesheets().add(Main.class.getResource("/resources/styles.css").toExternalForm());
+            scene.getStylesheets().add(Main.class.getResource("/styles.css").toExternalForm());
             primaryStage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
