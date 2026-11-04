@@ -2,7 +2,11 @@
 
 Written 2026-11-04 from a read of the code (about 2,450 lines of Java, 8 test classes, 20+ merged fix branches). Nothing here was run: `mvn test` and the app itself are still unchecked (see Phase 0).
 
-## 1. Where the project stands
+## Status (2026-11-04)
+
+Phases 0–4 are done and released as v1.0.0. Decisions made on the way: resume-game and the history screen were deleted rather than wired in (post-MVP); Hard = search depth 3 (depth 4 costs about half a second from the opening, more in the middlegame). Nothing was pushed or published. The backlog at the bottom is what is next.
+
+## 1. Where the project stood at the start
 
 **Works (per code + last surefire reports, all 33 tests green):**
 - Piece movement, castling, en passant, promotion, check, checkmate, stalemate
