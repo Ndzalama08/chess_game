@@ -146,9 +146,9 @@ public class GameController {
         if (moved) {
             // --- Playback sounds ---
             if (dest != null) {
-                SoundManager.play("/resources/sounds/capture.wav");
+                SoundManager.play("/sounds/capture.wav");
             } else {
-                SoundManager.play("/resources/sounds/move.wav");
+                SoundManager.play("/sounds/move.wav");
             }
 
             // update view & history
@@ -159,7 +159,7 @@ public class GameController {
             // --- Check/Checkmate sounds ---
             boolean opponentInCheck = gameManager.isInCheck(!gameManager.isWhiteTurn());
             if (opponentInCheck) {
-                SoundManager.play("/resources/sounds/check.wav");
+                SoundManager.play("/sounds/check.wav");
             }
             String winner = gameManager.isWhiteTurn() ? "Black" : "White";
             if (handleGameEnd(winner + " wins by checkmate!")) return;
@@ -188,7 +188,7 @@ public class GameController {
                 gameManager.attemptMove(aiMove);
 
                 // sound + view + history for AI
-                SoundManager.play("/resources/sounds/move.wav");
+                SoundManager.play("/sounds/move.wav");
                 boardView.update(b);
                 historyList.getItems().add(Move.notation(aiMove));
                 historyList.scrollTo(historyList.getItems().size() - 1);
@@ -196,7 +196,7 @@ public class GameController {
                 // check audio after AI move
                 boolean humanInCheck = gameManager.isInCheck(!gameManager.isWhiteTurn());
                 if (humanInCheck) {
-                    SoundManager.play("/resources/sounds/check.wav");
+                    SoundManager.play("/sounds/check.wav");
                 }
                 if (handleGameEnd("AI wins by checkmate!")) return;
             }
@@ -204,7 +204,7 @@ public class GameController {
         } else {
             // invalid move
             flashRed(cell);
-            SoundManager.play("/resources/sounds/illegal.wav");
+            SoundManager.play("/sounds/illegal.wav");
         }
 
         // 3) CLEAN UP selection
@@ -227,7 +227,7 @@ public class GameController {
     private boolean handleGameEnd(String checkmateMessage) {
         String message;
         if (gameManager.isCheckmate()) {
-            SoundManager.play("/resources/sounds/checkmate.wav");
+            SoundManager.play("/sounds/checkmate.wav");
             message = checkmateMessage;
         } else if (gameManager.isStalemate()) {
             message = "Draw by stalemate.";
