@@ -15,6 +15,11 @@ public class GameManager implements Cloneable {
     private boolean whiteTurn = true;
     private Move lastMove = null;   // track for en passant
 
+    // Half-moves since the last pawn move or capture (package-private for tests).
+    int halfmoveClock = 0;
+    // Position keys after every move, for threefold repetition.
+    private final List<String> positions = new ArrayList<>();
+
     // isWhite -> chosen piece name ("Queen"/"Rook"/"Bishop"/"Knight"). Defaults
     // to auto-Queen so headless callers (AI search, tests) don't need a UI.
     private Function<Boolean, String> promotionChooser = isWhite -> "Queen";
@@ -94,7 +99,11 @@ public class GameManager implements Cloneable {
         Piece[][] b = board.getBoard();
         Piece p = b[m.fromRow][m.fromCol];
         Piece dest = b[m.toRow][m.toCol];
+        boolean resetsClock = p instanceof Pawn || dest != null;
 
+        // first move: remember the starting position (the board may have been
+        // set up after construction, so it can't be captured earlier)
+        if (positions.isEmpty()) positions.add(positionKey());
 
         // handle special moves
         if (MoveValidator.isPromotion(m, board.getBoard())) {
@@ -114,7 +123,73 @@ public class GameManager implements Cloneable {
         p.markMoved();
         lastMove = m;
         whiteTurn = !whiteTurn;
+        halfmoveClock = resetsClock ? 0 : halfmoveClock + 1;
+        positions.add(positionKey());
         return true;
+    }
+
+    /**
+     * Piece placement, side to move and which kings/rooks can still castle.
+     * ponytail: ignores en passant availability, which can only matter for
+     * repetition in the rare case an en passant capture was possible once.
+     */
+    private String positionKey() {
+        StringBuilder sb = new StringBuilder(80);
+        for (Piece[] row : board.getBoard()) {
+            for (Piece p : row) {
+                if (p == null) { sb.append('.'); continue; }
+                String n = p.getClass().getSimpleName().substring(0, 2);
+                sb.append(p.isWhite() ? n.toUpperCase() : n);
+                if ((p instanceof King || p instanceof Rook) && p.hasMoved()) sb.append('*');
+            }
+        }
+        return sb.append(whiteTurn).toString();
+    }
+
+    public boolean isDrawByRepetition() {
+        if (positions.isEmpty()) return false;
+        String current = positions.get(positions.size() - 1);
+        return positions.stream().filter(current::equals).count() >= 3;
+    }
+
+    /** Fifty full moves (100 half-moves) without a pawn move or capture. */
+    public boolean isDrawByFiftyMoves() {
+        return halfmoveClock >= 100;
+    }
+
+    /** K v K, K+minor v K, or only bishops that all stand on one square colour. */
+    public boolean isDrawByInsufficientMaterial() {
+        int minors = 0;
+        int lightBishops = 0, darkBishops = 0, others = 0;
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = board.getBoard()[r][c];
+                if (p == null || p instanceof King) continue;
+                if (p instanceof Bishop) {
+                    if ((r + c) % 2 == 0) lightBishops++; else darkBishops++;
+                } else if (p instanceof Knight) {
+                    minors++;
+                } else {
+                    others++;   // pawn, rook or queen can always mate
+                }
+            }
+        }
+        if (others > 0) return false;
+        int bishops = lightBishops + darkBishops;
+        if (bishops == 0) return minors <= 1;
+        return minors == 0 && (lightBishops == 0 || darkBishops == 0);
+    }
+
+    /**
+     * Why the game is drawn right now, or null if it isn't. Single place the
+     * UI asks, so a new draw rule needs no controller change.
+     */
+    public String drawReason() {
+        if (isStalemate()) return "stalemate";
+        if (isDrawByInsufficientMaterial()) return "insufficient material";
+        if (isDrawByFiftyMoves()) return "the fifty-move rule";
+        if (isDrawByRepetition()) return "threefold repetition";
+        return null;
     }
 
     /**
@@ -284,6 +359,8 @@ public class GameManager implements Cloneable {
         // 3) Copy turn and last‐move
         copy.whiteTurn = this.whiteTurn;
         copy.lastMove  = this.lastMove;
+        copy.halfmoveClock = this.halfmoveClock;
+        copy.positions.addAll(this.positions);
         return copy;
     }
 
