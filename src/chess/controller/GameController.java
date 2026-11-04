@@ -229,8 +229,8 @@ public class GameController {
         if (gameManager.isCheckmate()) {
             SoundManager.play("/sounds/checkmate.wav");
             message = checkmateMessage;
-        } else if (gameManager.isStalemate()) {
-            message = "Draw by stalemate.";
+        } else if (gameManager.drawReason() != null) {
+            message = "Draw by " + gameManager.drawReason() + ".";
         } else {
             return false;
         }
