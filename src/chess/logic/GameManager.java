@@ -65,17 +65,18 @@ public class GameManager implements Cloneable {
         // 4b) En passant
         if (enPassant && !MoveValidator.canEnPassant(m, b, lastMove)) return false;
 
-        // 4c) Promotion (optional UI pop-up later)
-        if (MoveValidator.isPromotion(m, b)) {  }
-
         // 5) Must not leave own king in check
-        //    simulate the move
+        //    simulate the move; en passant also lifts the passed pawn off the
+        //    board, which can open a rank onto the king
+        Piece passed = enPassant ? b[m.fromRow][m.toCol] : null;
         b[m.toRow][m.toCol] = p;
         b[m.fromRow][m.fromCol] = null;
+        if (enPassant) b[m.fromRow][m.toCol] = null;
         boolean leavesKingInCheck = isInCheck(whiteTurn);
         // undo
         b[m.fromRow][m.fromCol] = p;
         b[m.toRow][m.toCol] = dest;
+        if (enPassant) b[m.fromRow][m.toCol] = passed;
         if (leavesKingInCheck) return false;
 
         return true;
